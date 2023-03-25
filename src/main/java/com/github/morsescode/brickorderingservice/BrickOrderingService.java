@@ -25,4 +25,10 @@ public class BrickOrderingService {
     public List<BrickOrder> getAllBrickOrders() {
         return brickOrderRepository.findAll();
     }
+
+    public BrickOrder updateBrickOrder(String orderReference, int bricksOrdered) {
+        BrickOrder brickOrder = getBrickOrderByOrderReference(orderReference);
+        brickOrder.setBricksOrdered(bricksOrdered);
+        return brickOrderRepository.save(brickOrder);
+    }
 }

@@ -86,4 +86,32 @@ public class BrickOrderingServiceTests {
         assertEquals(2, result.size());
         verify(brickOrderRepository).findAll();
     }
+
+    @Test
+    public void testUpdateBrickOrder() {
+        // Given
+        String orderReference = "abc123";
+        int oldBricksOrdered = 100;
+        int newBricksOrdered = 200;
+
+        BrickOrder existingOrder = new BrickOrder();
+        existingOrder.setOrderReference(orderReference);
+        existingOrder.setBricksOrdered(oldBricksOrdered);
+        when(brickOrderRepository.findByOrderReference(orderReference)).thenReturn(existingOrder);
+
+        BrickOrder updatedOrder = new BrickOrder();
+        updatedOrder.setOrderReference(orderReference);
+        updatedOrder.setBricksOrdered(newBricksOrdered);
+        when(brickOrderRepository.save(existingOrder)).thenReturn(updatedOrder);
+
+        // When
+        BrickOrder result = brickOrderingService.updateBrickOrder(orderReference, newBricksOrdered);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(orderReference, result.getOrderReference());
+        assertEquals(newBricksOrdered, result.getBricksOrdered());
+        verify(brickOrderRepository).findByOrderReference(orderReference);
+        verify(brickOrderRepository).save(existingOrder);
+    }
 }

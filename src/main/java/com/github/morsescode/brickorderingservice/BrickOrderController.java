@@ -35,4 +35,10 @@ public class BrickOrderController {
     public List<BrickOrder> getAllBrickOrders() {
         return brickOrderingService.getAllBrickOrders();
     }
+
+    @PostMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public BrickOrder updatBrickOrder(@RequestParam String orderReference, int bricks) {
+        return brickOrderingService.updateBrickOrder(orderReference, bricks);
+    }
 }

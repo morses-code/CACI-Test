@@ -49,8 +49,10 @@ public class BrickOrderControllerTests {
 
     @Test
     public void testCreateOrder() throws Exception {
+        // Given
         when(brickOrderingService.createBrickOrder(numBricksOrdered)).thenReturn(brickOrder);
 
+        // When/Then
         mockMvc.perform(post("/api/order")
                 .param("bricks", Integer.toString(numBricksOrdered)))
                 .andExpect(status().isOk())
@@ -63,8 +65,10 @@ public class BrickOrderControllerTests {
 
     @Test
     public void testGetOrder() throws Exception {
+        // Given
         when(brickOrderingService.getBrickOrderByOrderReference(anyString())).thenReturn(brickOrder);
 
+        // When/Then
         mockMvc.perform(get("/api/order")
                 .param("orderReference", brickOrder.getOrderReference()))
                 .andExpect(status().isOk())
@@ -77,6 +81,7 @@ public class BrickOrderControllerTests {
 
     @Test
     public void testGetAllOrders() throws Exception {
+        // Given
         BrickOrder anotherOrder = new BrickOrder();
         anotherOrder.setBricksOrdered(10);
         anotherOrder.setOrderReference(UUID.randomUUID().toString());
@@ -87,6 +92,7 @@ public class BrickOrderControllerTests {
 
         when(brickOrderingService.getAllBrickOrders()).thenReturn(brickOrders);
 
+        // When/Then
         mockMvc.perform(get("/api/order/all"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -95,5 +101,29 @@ public class BrickOrderControllerTests {
                 .andExpect(jsonPath("$[0].orderReference", is(brickOrder.getOrderReference())))
                 .andExpect(jsonPath("$[1].bricksOrdered", is(anotherOrder.getBricksOrdered())))
                 .andExpect(jsonPath("$[1].orderReference", is(anotherOrder.getOrderReference())));
+
+        verify(brickOrderingService).getAllBrickOrders();
+    }
+
+    @Test
+    void testUpdateBrickOrder() throws Exception {
+        // Given
+        String orderReference = "test-reference";
+        int bricksOrdered = 10;
+        BrickOrder updatedOrder = new BrickOrder();
+        updatedOrder.setOrderReference(orderReference);
+        updatedOrder.setBricksOrdered(bricksOrdered);
+        when(brickOrderingService.updateBrickOrder(orderReference, bricksOrdered)).thenReturn(updatedOrder);
+
+        // When/Then
+        mockMvc.perform(post("/api/order/update")
+                .param("orderReference", orderReference)
+                .param("bricks", String.valueOf(bricksOrdered)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.orderReference", is(orderReference)))
+                .andExpect(jsonPath("$.bricksOrdered", is(bricksOrdered)));
+
+        verify(brickOrderingService).updateBrickOrder(orderReference, bricksOrdered);
     }
 }
