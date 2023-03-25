@@ -19,6 +19,9 @@ public class BrickOrder {
     @Column(nullable = false)
     private int bricksOrdered;
 
+    @Column(nullable = false)
+    private Boolean isDispatched;
+
     public Long getId() {
         return id;
     }
@@ -41,6 +44,14 @@ public class BrickOrder {
 
     public void setBricksOrdered(int bricksOrdered) {
         this.bricksOrdered = bricksOrdered;
+    }
+
+    public Boolean getIsDispatched() {
+        return isDispatched;
+    }
+
+    public void setIsDispatched(Boolean isDispatched) {
+        this.isDispatched = isDispatched;
     }
 
 }

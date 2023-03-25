@@ -31,4 +31,16 @@ public class BrickOrderingService {
         brickOrder.setBricksOrdered(bricksOrdered);
         return brickOrderRepository.save(brickOrder);
     }
+
+    public BrickOrder orderDispatched(String orderReference) {
+        if (orderReference == null) {
+            throw new IllegalArgumentException("Order reference cannot be null");
+        }
+        BrickOrder brickOrder = getBrickOrderByOrderReference(orderReference);
+        if (brickOrder == null) {
+            throw new IllegalArgumentException("Brick order not found");
+        }
+        brickOrder.setIsDispatched(true);
+        return brickOrderRepository.save(brickOrder);
+    }
 }

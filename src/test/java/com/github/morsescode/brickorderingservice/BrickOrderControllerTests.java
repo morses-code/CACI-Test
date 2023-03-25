@@ -1,5 +1,6 @@
 package com.github.morsescode.brickorderingservice;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,6 +36,9 @@ public class BrickOrderControllerTests {
 
     @MockBean
     private BrickOrderingService brickOrderingService;
+
+    @MockBean
+    private BrickOrderRepository brickOrderRepository;
 
     private BrickOrder brickOrder;
     private int numBricksOrdered;
@@ -106,24 +110,53 @@ public class BrickOrderControllerTests {
     }
 
     @Test
-    void testUpdateBrickOrder() throws Exception {
+    public void testUpdateBrickOrder() throws Exception {
         // Given
-        String orderReference = "test-reference";
+        String newOrderReference = "test-reference";
         int bricksOrdered = 10;
         BrickOrder updatedOrder = new BrickOrder();
-        updatedOrder.setOrderReference(orderReference);
+        updatedOrder.setOrderReference(newOrderReference);
         updatedOrder.setBricksOrdered(bricksOrdered);
-        when(brickOrderingService.updateBrickOrder(orderReference, bricksOrdered)).thenReturn(updatedOrder);
+        when(brickOrderingService.updateBrickOrder(newOrderReference, bricksOrdered)).thenReturn(updatedOrder);
 
         // When/Then
         mockMvc.perform(post("/api/order/update")
-                .param("orderReference", orderReference)
+                .param("orderReference", newOrderReference)
                 .param("bricks", String.valueOf(bricksOrdered)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.orderReference", is(orderReference)))
+                .andExpect(jsonPath("$.orderReference", is(newOrderReference)))
                 .andExpect(jsonPath("$.bricksOrdered", is(bricksOrdered)));
 
-        verify(brickOrderingService).updateBrickOrder(orderReference, bricksOrdered);
+        verify(brickOrderingService).updateBrickOrder(newOrderReference, bricksOrdered);
+    }
+
+    @Test
+    public void testOrderDispatched() throws Exception {
+        // Given
+        BrickOrder dispatchedBrickOrder = new BrickOrder();
+        dispatchedBrickOrder.setOrderReference(UUID.randomUUID().toString());
+        dispatchedBrickOrder.setBricksOrdered(numBricksOrdered);
+        dispatchedBrickOrder.setIsDispatched(true);
+
+        when(brickOrderingService.orderDispatched(dispatchedBrickOrder.getOrderReference()))
+                .thenReturn(dispatchedBrickOrder);
+
+        // When/Then
+        mockMvc.perform(post("/api/order/dispatch")
+                .param("orderReference", dispatchedBrickOrder.getOrderReference()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.bricksOrdered", is(numBricksOrdered)))
+                .andExpect(jsonPath("$.orderReference", is(dispatchedBrickOrder.getOrderReference())))
+                .andExpect(jsonPath("$.isDispatched", is(true)));
+
+        verify(brickOrderingService).orderDispatched(dispatchedBrickOrder.getOrderReference());
+    }
+
+    @Test
+    public void testOrderDispatchedWhenOrderReferenceIsNullReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/order/dispatch"))
+                .andExpect(status().isBadRequest());
     }
 }

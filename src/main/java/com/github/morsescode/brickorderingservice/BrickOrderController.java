@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +39,18 @@ public class BrickOrderController {
 
     @PostMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public BrickOrder updatBrickOrder(@RequestParam String orderReference, int bricks) {
+    public BrickOrder updateBrickOrder(@RequestParam String orderReference, int bricks) {
         return brickOrderingService.updateBrickOrder(orderReference, bricks);
+    }
+
+    @PostMapping(value = "/dispatch", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> orderDispatched(@RequestParam String orderReference) {
+        try {
+            BrickOrder brickOrder = brickOrderingService.orderDispatched(orderReference);
+            return ResponseEntity.ok(brickOrder);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

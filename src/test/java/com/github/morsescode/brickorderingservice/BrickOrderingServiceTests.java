@@ -2,6 +2,7 @@ package com.github.morsescode.brickorderingservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -114,4 +115,43 @@ public class BrickOrderingServiceTests {
         verify(brickOrderRepository).findByOrderReference(orderReference);
         verify(brickOrderRepository).save(existingOrder);
     }
+
+    @Test
+    public void testBrickOrderDispatched() throws Exception {
+        // Given
+        String orderReference = "abc123";
+        int bricks = 10;
+
+        BrickOrder existingOrder = new BrickOrder();
+        existingOrder.setOrderReference(orderReference);
+        existingOrder.setBricksOrdered(bricks);
+        when(brickOrderRepository.findByOrderReference(orderReference)).thenReturn(existingOrder);
+
+        BrickOrder dispatchedOrder = new BrickOrder();
+        dispatchedOrder.setOrderReference(orderReference);
+        dispatchedOrder.setIsDispatched(true);
+        when(brickOrderRepository.save(existingOrder)).thenReturn(dispatchedOrder);
+
+        // When
+        BrickOrder result = brickOrderingService.orderDispatched(orderReference);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(true, result.getIsDispatched());
+        verify(brickOrderRepository).findByOrderReference(orderReference);
+        verify(brickOrderRepository).save(existingOrder);
+    }
+
+    @Test
+    public void testOrderDispatchedWhenBrickOrderIsNull() {
+        // Given
+        String orderReference = "invalid-reference";
+        when(brickOrderingService.getBrickOrderByOrderReference(orderReference)).thenReturn(null);
+
+        // When/Then
+        assertThrows(Exception.class, () -> brickOrderingService.orderDispatched(orderReference));
+
+        verify(brickOrderRepository).findByOrderReference(orderReference);
+    }
+
 }
