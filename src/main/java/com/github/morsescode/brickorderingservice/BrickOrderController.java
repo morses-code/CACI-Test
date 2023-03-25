@@ -18,6 +18,6 @@ public class BrickOrderController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public BrickOrder createBrickOrder(@RequestParam int bricks) {
-        return brickOrderingService.creatBrickOrder(bricks);
+        return brickOrderingService.createBrickOrder(bricks);
     }
 }

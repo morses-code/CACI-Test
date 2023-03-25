@@ -33,7 +33,7 @@ public class BrickOrderingServiceTests {
         when(brickOrderRepository.save(any(BrickOrder.class))).thenReturn(brickOrder);
 
         // When
-        BrickOrder result = brickOrderingService.creatBrickOrder(numBricksOrdered);
+        BrickOrder result = brickOrderingService.createBrickOrder(numBricksOrdered);
 
         // Then
         assertNotNull(result.getOrderReference());

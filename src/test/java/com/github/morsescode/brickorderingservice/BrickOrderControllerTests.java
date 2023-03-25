@@ -36,7 +36,7 @@ public class BrickOrderControllerTests {
         BrickOrder brickOrder = new BrickOrder();
         brickOrder.setBricksOrdered(numBricksOrdered);
         brickOrder.setOrderReference(UUID.randomUUID().toString());
-        when(brickOrderingService.creatBrickOrder(numBricksOrdered)).thenReturn(brickOrder);
+        when(brickOrderingService.createBrickOrder(numBricksOrdered)).thenReturn(brickOrder);
 
         mockMvc.perform(post("/api/order")
                 .param("bricks", Integer.toString(numBricksOrdered)))
@@ -45,6 +45,6 @@ public class BrickOrderControllerTests {
                 .andExpect(jsonPath("$.orderReference", notNullValue()))
                 .andExpect(jsonPath("$.bricksOrdered", is(numBricksOrdered)));
 
-        verify(brickOrderingService).creatBrickOrder(numBricksOrdered);
+        verify(brickOrderingService).createBrickOrder(numBricksOrdered);
     }
 }

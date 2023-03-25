@@ -10,7 +10,7 @@ public class BrickOrderingService {
     @Autowired
     private BrickOrderRepository brickOrderRepository;
 
-    public BrickOrder creatBrickOrder(int bricksOrdered) {
+    public BrickOrder createBrickOrder(int bricksOrdered) {
         BrickOrder brickOrder = new BrickOrder();
         brickOrder.setBricksOrdered(bricksOrdered);
         brickOrder.setOrderReference(UUID.randomUUID().toString());
