@@ -10,7 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.hasSize;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -70,5 +73,27 @@ public class BrickOrderControllerTests {
                 .andExpect(jsonPath("$.bricksOrdered", is(numBricksOrdered)));
 
         verify(brickOrderingService).getBrickOrderByOrderReference(brickOrder.getOrderReference());
+    }
+
+    @Test
+    public void testGetAllOrders() throws Exception {
+        BrickOrder anotherOrder = new BrickOrder();
+        anotherOrder.setBricksOrdered(10);
+        anotherOrder.setOrderReference(UUID.randomUUID().toString());
+
+        List<BrickOrder> brickOrders = new ArrayList<BrickOrder>();
+        brickOrders.add(brickOrder);
+        brickOrders.add(anotherOrder);
+
+        when(brickOrderingService.getAllBrickOrders()).thenReturn(brickOrders);
+
+        mockMvc.perform(get("/api/order/all"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].bricksOrdered", is(brickOrder.getBricksOrdered())))
+                .andExpect(jsonPath("$[0].orderReference", is(brickOrder.getOrderReference())))
+                .andExpect(jsonPath("$[1].bricksOrdered", is(anotherOrder.getBricksOrdered())))
+                .andExpect(jsonPath("$[1].orderReference", is(anotherOrder.getOrderReference())));
     }
 }

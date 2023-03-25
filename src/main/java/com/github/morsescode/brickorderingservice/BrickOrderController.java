@@ -1,5 +1,7 @@
 package com.github.morsescode.brickorderingservice;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -26,5 +28,11 @@ public class BrickOrderController {
     @ResponseBody
     public BrickOrder getBrickOrder(@RequestParam String orderReference) {
         return brickOrderingService.getBrickOrderByOrderReference(orderReference);
+    }
+
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<BrickOrder> getAllBrickOrders() {
+        return brickOrderingService.getAllBrickOrders();
     }
 }
