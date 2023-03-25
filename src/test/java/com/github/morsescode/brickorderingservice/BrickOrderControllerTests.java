@@ -1,9 +1,11 @@
 package com.github.morsescode.brickorderingservice;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -11,6 +13,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +33,19 @@ public class BrickOrderControllerTests {
     @MockBean
     private BrickOrderingService brickOrderingService;
 
-    @Test
-    public void testCreateOrder() throws Exception {
-        int numBricksOrdered = 100;
-        BrickOrder brickOrder = new BrickOrder();
+    private BrickOrder brickOrder;
+    private int numBricksOrdered;
+
+    @BeforeEach
+    public void setUp() {
+        numBricksOrdered = 100;
+        brickOrder = new BrickOrder();
         brickOrder.setBricksOrdered(numBricksOrdered);
         brickOrder.setOrderReference(UUID.randomUUID().toString());
+    }
+
+    @Test
+    public void testCreateOrder() throws Exception {
         when(brickOrderingService.createBrickOrder(numBricksOrdered)).thenReturn(brickOrder);
 
         mockMvc.perform(post("/api/order")
@@ -46,5 +56,19 @@ public class BrickOrderControllerTests {
                 .andExpect(jsonPath("$.bricksOrdered", is(numBricksOrdered)));
 
         verify(brickOrderingService).createBrickOrder(numBricksOrdered);
+    }
+
+    @Test
+    public void testGetOrder() throws Exception {
+        when(brickOrderingService.getBrickOrderByOrderReference(anyString())).thenReturn(brickOrder);
+
+        mockMvc.perform(get("/api/order")
+                .param("orderReference", brickOrder.getOrderReference()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.orderReference", is(brickOrder.getOrderReference())))
+                .andExpect(jsonPath("$.bricksOrdered", is(numBricksOrdered)));
+
+        verify(brickOrderingService).getBrickOrderByOrderReference(brickOrder.getOrderReference());
     }
 }

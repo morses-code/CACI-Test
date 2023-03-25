@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BrickOrderRepository extends JpaRepository<BrickOrder, Long> {
-
+    BrickOrder findByOrderReference(String orderReference);
 }

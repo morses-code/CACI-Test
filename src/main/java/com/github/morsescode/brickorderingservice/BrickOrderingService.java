@@ -1,5 +1,6 @@
 package com.github.morsescode.brickorderingservice;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,5 +16,13 @@ public class BrickOrderingService {
         brickOrder.setBricksOrdered(bricksOrdered);
         brickOrder.setOrderReference(UUID.randomUUID().toString());
         return brickOrderRepository.save(brickOrder);
+    }
+
+    public BrickOrder getBrickOrderByOrderReference(String orderReference) {
+        return brickOrderRepository.findByOrderReference(orderReference);
+    }
+
+    public List<BrickOrder> getAllBrickOrders() {
+        return brickOrderRepository.findAll();
     }
 }
