@@ -20,7 +20,7 @@ public class BrickOrder {
     private int bricksOrdered;
 
     @Column(nullable = false)
-    private Boolean isDispatched;
+    private Boolean isDispatched = false;
 
     public Long getId() {
         return id;

@@ -28,6 +28,9 @@ public class BrickOrderingService {
 
     public BrickOrder updateBrickOrder(String orderReference, int bricksOrdered) {
         BrickOrder brickOrder = getBrickOrderByOrderReference(orderReference);
+        if (brickOrder.getIsDispatched()) {
+            throw new IllegalArgumentException("Order already dispatched");
+        }
         brickOrder.setBricksOrdered(bricksOrdered);
         return brickOrderRepository.save(brickOrder);
     }

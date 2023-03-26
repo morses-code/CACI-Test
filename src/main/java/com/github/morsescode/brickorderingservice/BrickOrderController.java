@@ -39,8 +39,17 @@ public class BrickOrderController {
 
     @PostMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public BrickOrder updateBrickOrder(@RequestParam String orderReference, int bricks) {
-        return brickOrderingService.updateBrickOrder(orderReference, bricks);
+    public ResponseEntity<?> updateBrickOrder(@RequestParam String orderReference, int bricks) {
+        try {
+            BrickOrder brickOrder = brickOrderingService.getBrickOrderByOrderReference(orderReference);
+            if (brickOrder.getIsDispatched()) {
+                throw new IllegalArgumentException("Order already dispatched");
+            }
+            brickOrder.setBricksOrdered(bricks);
+            return ResponseEntity.ok(brickOrderingService.updateBrickOrder(orderReference, bricks));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping(value = "/dispatch", produces = MediaType.APPLICATION_JSON_VALUE)

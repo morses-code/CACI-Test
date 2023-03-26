@@ -1,6 +1,5 @@
 package com.github.morsescode.brickorderingservice;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -119,6 +118,11 @@ public class BrickOrderControllerTests {
         updatedOrder.setBricksOrdered(bricksOrdered);
         when(brickOrderingService.updateBrickOrder(newOrderReference, bricksOrdered)).thenReturn(updatedOrder);
 
+        BrickOrder brickOrder = new BrickOrder();
+        brickOrder.setBricksOrdered(bricksOrdered);
+        brickOrder.setOrderReference(newOrderReference);
+        when(brickOrderingService.getBrickOrderByOrderReference(newOrderReference)).thenReturn(brickOrder);
+
         // When/Then
         mockMvc.perform(post("/api/order/update")
                 .param("orderReference", newOrderReference)
@@ -158,5 +162,26 @@ public class BrickOrderControllerTests {
     public void testOrderDispatchedWhenOrderReferenceIsNullReturnsBadRequest() throws Exception {
         mockMvc.perform(post("/api/order/dispatch"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateDispatchedOrderBadRequest() throws Exception {
+        // Given
+        BrickOrder dispatchedOrder = new BrickOrder();
+        dispatchedOrder.setBricksOrdered(100);
+        dispatchedOrder.setOrderReference(UUID.randomUUID().toString());
+        dispatchedOrder.setIsDispatched(true);
+
+        when(brickOrderingService.getBrickOrderByOrderReference(dispatchedOrder.getOrderReference()))
+                .thenReturn(dispatchedOrder);
+
+        // When/Then
+        mockMvc.perform(post("/api/order/update")
+                .param("orderReference", dispatchedOrder.getOrderReference())
+                .param("bricks", String.valueOf(50)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Order already dispatched"));
+
+        verify(brickOrderingService).getBrickOrderByOrderReference(dispatchedOrder.getOrderReference());
     }
 }
