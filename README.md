@@ -55,7 +55,7 @@ Update Order
 ### Method: POST
 
 > ```
-> localhost:8080/api/order/update?orderReference={{orderReference}}
+> localhost:8080/api/order/update?orderReference={{orderReference}}&bricks={{bricks}}
 > ```
 
 ### Query Params
